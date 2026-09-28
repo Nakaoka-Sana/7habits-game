@@ -1,980 +1,417 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>7つの習慣 - ドット絵アドベンチャー</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --pixel-bg: #121013;
-      --pixel-card-bg: #1b1924;
-      --pixel-border: #4a4458;
-      --pixel-gold: #f1c40f;
-      --pixel-text: #f5f6fa;
-      --pixel-accent: #e74c3c;
-      --pixel-green: #2ecc71;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7つの習慣 - レトロRPG</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --pixel-bg: #000000;
+            --pixel-border: #ffffff;
+            --pixel-accent: #ffcc00;
+        }
 
-    * {
-      box-sizing: border-box;
-      user-select: none;
-      font-family: 'Courier New', Monaco, monospace, sans-serif;
-      image-rendering: pixelated;
-    }
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            font-family: 'Courier New', Courier, monospace, sans-serif;
+        }
 
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #08070a;
-      color: var(--pixel-text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-    }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-    #app-container {
-      width: 820px;
-      height: 600px;
-      background-color: var(--pixel-bg);
-      border: 6px solid #2d2b38;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0,0,0,0.9);
-      border-radius: 12px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
+        #game-container {
+            width: 480px;
+            height: 720px;
+            background-color: var(--pixel-bg);
+            border: 4px solid var(--pixel-border);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .pixel-card {
-      background: var(--pixel-card-bg);
-      border: 4px solid #ffffff;
-      outline: 4px solid #000000;
-      border-radius: 8px;
-      box-shadow: 4px 4px 0px #000000;
-      padding: 12px;
-      position: relative;
-    }
+        .screen {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            padding: 16px;
+        }
 
-    .pixel-btn {
-      background: #e77f67;
-      color: #fff;
-      border: 3px solid #fff;
-      outline: 3px solid #000;
-      padding: 8px 16px;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 3px 3px 0px #000;
-      border-radius: 4px;
-      transition: transform 0.05s;
-    }
+        .active {
+            display: flex;
+        }
 
-    .pixel-btn:hover {
-      background: #cf6a51;
-    }
+        /* レトロドットUI */
+        .pixel-box {
+            background-color: #000;
+            border: 4px solid #fff;
+            padding: 12px;
+            color: #fff;
+        }
 
-    .pixel-btn:active {
-      transform: translate(2px, 2px);
-      box-shadow: 1px 1px 0px #000;
-    }
+        .pixel-btn {
+            background: #222;
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 4px 0;
+            text-align: center;
+            width: 100%;
+        }
+        .pixel-btn:hover {
+            background: #ffcc00;
+            color: #000;
+        }
 
-    .screen {
-      display: none;
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      flex-direction: column;
-      padding: 12px;
-      z-index: 10;
-    }
+        /* スキン選択 */
+        .skin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .skin-card {
+            border: 2px solid #777;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            background: #111;
+        }
+        .skin-card.selected {
+            border-color: #ffcc00;
+            background: #333;
+        }
 
-    .screen.active {
-      display: flex;
-    }
+        /* 下部ドットテキストメッセージ（黒背景・白太枠） */
+        #dialogue-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background-color: #000000;
+            border: 4px solid #ffffff;
+            padding: 12px;
+            display: none;
+            z-index: 100;
+        }
 
-    #setup-screen {
-      justify-content: center;
-      align-items: center;
-      background: radial-gradient(circle, #2c2a38 0%, #121013 100%);
-    }
+        .choice-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin-top: 6px;
+            background: #111;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .choice-btn:hover {
+            background: #ffcc00;
+            color: #000;
+        }
 
-    .title-box {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .title-box h1 {
-      font-size: 26px;
-      color: var(--pixel-gold);
-      text-shadow: 3px 3px 0 #000;
-      margin: 0 0 6px 0;
-    }
-
-    .input-group {
-      margin: 10px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      width: 260px;
-    }
-
-    .input-group input[type="text"] {
-      background: #000;
-      border: 2px solid #fff;
-      color: #fff;
-      padding: 8px;
-      font-size: 16px;
-      text-align: center;
-      border-radius: 4px;
-    }
-
-    .gender-opts {
-      display: flex;
-      justify-content: space-around;
-      margin: 8px 0;
-    }
-
-    .gender-label {
-      cursor: pointer;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    #game-screen {
-      padding: 0;
-      background: #000;
-    }
-
-    .hud-bar {
-      height: 48px;
-      background: #1b1924;
-      border-bottom: 4px solid #000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 16px;
-      z-index: 20;
-    }
-
-    .hud-stat {
-      font-size: 13px;
-      font-weight: bold;
-      color: #f1c40f;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .canvas-wrapper {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-      background: #15131c;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #gameCanvas {
-      background: #0d0c12;
-      box-shadow: 0 0 10px rgba(0,0,0,0.8);
-    }
-
-    .dialogue-card {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      right: 12px;
-      background: rgba(20, 18, 28, 0.95);
-      border: 4px solid #ffffff;
-      outline: 4px solid #000;
-      border-radius: 6px;
-      padding: 12px 16px;
-      color: #fff;
-      z-index: 30;
-      display: none;
-    }
-
-    .dialogue-speaker {
-      font-size: 13px;
-      color: var(--pixel-gold);
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-
-    .dialogue-text {
-      font-size: 13px;
-      line-height: 1.4;
-      margin-bottom: 10px;
-    }
-
-    .dialogue-options {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .dialogue-opt-btn {
-      background: #2b2836;
-      border: 2px solid #fff;
-      color: #fff;
-      padding: 6px 10px;
-      text-align: left;
-      font-size: 12px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    .dialogue-opt-btn:hover {
-      background: #e77f67;
-    }
-
-    .touch-controls {
-      position: absolute;
-      bottom: 16px;
-      right: 16px;
-      display: grid;
-      grid-template-columns: repeat(3, 40px);
-      grid-template-rows: repeat(3, 40px);
-      gap: 4px;
-      z-index: 25;
-      opacity: 0.8;
-    }
-
-    .dpad-btn {
-      background: #2b2836;
-      border: 2px solid #fff;
-      color: #fff;
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: 2px 2px 0 #000;
-    }
-
-    .dpad-btn:active {
-      background: #e77f67;
-    }
-
-    #shop-screen {
-      background: rgba(10, 8, 14, 0.95);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .shop-card {
-      width: 600px;
-      height: 480px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .shop-items-grid {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      overflow-y: auto;
-      padding: 6px;
-    }
-
-    .shop-item-card {
-      background: #23202e;
-      border: 2px solid #fff;
-      border-radius: 6px;
-      padding: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    #result-screen {
-      background: radial-gradient(circle, #2a2238 0%, #0d0b12 100%);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .result-card {
-      width: 700px;
-      height: 480px;
-      display: flex;
-      gap: 16px;
-    }
-
-    .chart-box {
-      width: 320px;
-      height: 320px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 8px;
-      padding: 8px;
-    }
-
-    .eval-box {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .interaction-prompt {
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #f1c40f;
-      color: #000;
-      padding: 2px 8px;
-      font-weight: bold;
-      font-size: 11px;
-      border-radius: 4px;
-      border: 2px solid #000;
-      pointer-events: none;
-      animation: bounce 0.6s infinite alternate;
-      display: none;
-    }
-
-    @keyframes bounce {
-      from { transform: translate(-50%, 0); }
-      to { transform: translate(-50%, -6px); }
-    }
-  </style>
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+    </style>
 </head>
 <body>
 
-  <div id="app-container">
-
-    <!-- 0. Title / Player Setup Screen -->
-    <div id="setup-screen" class="screen active">
-      <div class="pixel-card title-box" style="width: 480px;">
-        <h1>7つの習慣 アドベンチャー</h1>
-        <p style="font-size: 12px; color: #a4b0be; margin-bottom: 16px;">〜 ドット絵世界を冒険して成長しよう 〜</p>
-
-        <div class="input-group" style="margin: 0 auto;">
-          <label style="font-size: 13px; font-weight: bold;">冒険者のなまえ</label>
-          <input type="text" id="player-name" value="みらい" maxlength="8">
-        </div>
-
-        <div class="input-group" style="margin: 12px auto;">
-          <label style="font-size: 13px; font-weight: bold;">すがた（初期制服）</label>
-          <div class="gender-opts">
-            <label class="gender-label">
-              <input type="radio" name="gender" value="girl" checked> 女子（ブレザー）
-            </label>
-            <label class="gender-label">
-              <input type="radio" name="gender" value="boy"> 男子（学ラン）
-            </label>
-          </div>
-        </div>
-
-        <button class="pixel-btn" onclick="startGame()" style="margin-top: 12px; width: 200px;">冒険をはじめる ▶</button>
-      </div>
+<div id="game-container">
+    <!-- 1. タイトル画面 -->
+    <div id="title-screen" class="screen active" style="justify-content:center; align-items:center; text-align:center;">
+        <h1 style="color:#ffcc00; font-size:24px; margin-bottom:30px;">7つの習慣<br>ドットRPG</h1>
+        <button class="pixel-btn" onclick="goToSetup()">はじめから（スタート）</button>
+        <button class="pixel-btn" onclick="openMenu()">設定・メニュー</button>
     </div>
 
-    <!-- 1. Main Isometric Game Screen -->
-    <div id="game-screen" class="screen">
-      <div class="hud-bar">
-        <div class="hud-stat">
-          <span id="hud-name">みらい</span>
-          <span>PT: <strong id="hud-pt" style="color:#2ecc71;">0</strong></span>
-        </div>
-        <div class="hud-stat">
-          <span>ステージ: <strong id="hud-stage">1 / 3</strong></span>
-          <button class="pixel-btn" onclick="openShop()" style="padding: 4px 10px; font-size: 11px;">🛍️ 購買部</button>
-        </div>
-      </div>
+    <!-- 2. 名前・初期スキン選択画面（初期状態は空欄） -->
+    <div id="setup-screen" class="screen pixel-box">
+        <h3>キャラクター作成</h3>
+        <label>名前を入力してください（空欄可）:</label>
+        <input type="text" id="player-name-input" value="" placeholder="（名前を入力）" style="width:100%; padding:8px; margin:10px 0; background:#111; border:1px solid #fff; color:#fff;">
 
-      <div class="canvas-wrapper">
-        <canvas id="gameCanvas" width="760" height="480"></canvas>
-        <div id="interaction-prompt" class="interaction-prompt">会話 [SPACE / タップ]</div>
-
-        <!-- Dialogue & Quiz Overlay Box -->
-        <div id="dialogue-card" class="dialogue-card">
-          <div id="dialogue-speaker" class="dialogue-speaker">NPCのなまえ</div>
-          <div id="dialogue-text" class="dialogue-text">話しかけてくれてありがとう！</div>
-          <div id="dialogue-options" class="dialogue-options"></div>
-          <button id="dialogue-close-btn" class="pixel-btn" onclick="closeDialogue()" style="display:none; margin-top:8px;">閉じる</button>
+        <label>初期スキンを選択:</label>
+        <div class="skin-grid">
+            <div class="skin-card selected" onclick="selectSkin('学ラン', this)">学ラン</div>
+            <div class="skin-card" onclick="selectSkin('ブレザー(パンツ)', this)">ブレザー(パンツ)</div>
+            <div class="skin-card" onclick="selectSkin('ブレザー(スカート)', this)">ブレザー(スカート)</div>
+            <div class="skin-card" onclick="selectSkin('セーラー', this)">セーラー</div>
         </div>
 
-        <!-- Touch D-Pad Overlay -->
-        <div class="touch-controls">
-          <div></div>
-          <div class="dpad-btn" onmousedown="setMove('up')" onmouseup="stopMove()" ontouchstart="setMove('up')" ontouchend="stopMove()">▲</div>
-          <div></div>
-          <div class="dpad-btn" onmousedown="setMove('left')" onmouseup="stopMove()" ontouchstart="setMove('left')" ontouchend="stopMove()">◄</div>
-          <div class="dpad-btn" onclick="triggerAction()" style="background:#e77f67;">★</div>
-          <div class="dpad-btn" onmousedown="setMove('right')" onmouseup="stopMove()" ontouchstart="setMove('right')" ontouchend="stopMove()">►</div>
-          <div></div>
-          <div class="dpad-btn" onmousedown="setMove('down')" onmouseup="stopMove()" ontouchstart="setMove('down')" ontouchend="stopMove()">▼</div>
-          <div></div>
-        </div>
-      </div>
+        <button class="pixel-btn" onclick="startGame()">決定してステージマップへ</button>
     </div>
 
-    <!-- 2. Shop & Equipment Screen -->
-    <div id="shop-screen" class="screen">
-      <div class="pixel-card shop-card">
-        <div style="display:flex; justify-size: space-between; justify-content: space-between; align-items: center; border-bottom: 2px solid #4a4458; padding-bottom: 8px; margin-bottom: 10px;">
-          <h2 style="margin: 0; color: var(--pixel-gold); font-size: 18px;">🛍️ 操山購買部ショップ</h2>
-          <div style="font-size: 13px;">所持ポイント: <strong id="shop-pt-val" style="color:#2ecc71;">0</strong> PT</div>
-        </div>
-        <div id="shop-items-grid" class="shop-items-grid"></div>
-        <button class="pixel-btn" onclick="closeShop()" style="margin-top: 10px; align-self: center;">マップにもどる ▶</button>
-      </div>
+    <!-- 3. ステージ選択マップ -->
+    <div id="map-screen" class="screen pixel-box" style="overflow-y:auto;">
+        <h3>ステージ選択</h3>
+        <p>所持ポイント: <span id="user-points" style="color:#ffcc00;">0</span> PT</p>
+        <div id="stage-buttons"></div>
     </div>
 
-    <!-- 3. Final Evaluation & Radar Chart Screen -->
-    <div id="result-screen" class="screen">
-      <div class="pixel-card result-card">
-        <div class="chart-box">
-          <canvas id="finalRadarChart"></canvas>
+    <!-- 4. メインゲーム画面 -->
+    <div id="game-screen" class="screen" style="padding:0;">
+        <div style="position:absolute; top:8px; left:8px; right:8px; display:flex; justify-content:space-between; z-index:10;">
+            <div class="pixel-box" id="mission-tracker" style="font-size:11px; padding:6px;">Mission: ---</div>
+            <button class="pixel-btn" style="width:auto; padding:4px 8px; font-size:10px;" onclick="openMenu()">MENU</button>
         </div>
-        <div class="eval-box">
-          <div>
-            <h2 style="margin: 0 0 6px 0; color: var(--pixel-gold); font-size: 18px;">探究スコア診断結果</h2>
-            <p id="result-summary-text" style="font-size: 12px; line-height: 1.5; color: #dcdde1;"></p>
-          </div>
-          <div class="pixel-card" style="background: #110f17; font-size: 11px; padding: 8px;">
-            <strong style="color: #2ecc71;">【探究伴走アドバイス】</strong>
-            <p id="result-detailed-advice" style="margin: 4px 0 0 0; color: #a4b0be;"></p>
-          </div>
-          <button class="pixel-btn" onclick="location.reload()" style="width: 100%;">タイトルへ戻る 🔄</button>
+        
+        <canvas id="game-canvas" width="480" height="720"></canvas>
+
+        <!-- ドット風下部メッセージ枠 -->
+        <div id="dialogue-overlay">
+            <div id="speaker-name" style="color:#ffcc00; font-weight:bold; font-size:13px; margin-bottom:4px;"></div>
+            <div id="dialogue-text" style="font-size:12px; line-height:1.4;"></div>
+            <div id="choices-container" style="margin-top:8px;"></div>
         </div>
-      </div>
     </div>
 
-  </div>
+    <!-- 5. ステージ評価画面 -->
+    <div id="eval-screen" class="screen pixel-box" style="overflow-y:auto;">
+        <h3>STAGE CLEAR!</h3>
+        <canvas id="radarChart" width="300" height="200"></canvas>
+        <p style="margin-top:10px;"><b>診断タイプ:</b> <span id="eval-type" style="color:#ffcc00;">--</span></p>
+        <p><b>アドバイス:</b></p>
+        <p id="eval-advice" style="font-size:12px; color:#ccc; line-height:1.4;"></p>
+        <button class="pixel-btn" onclick="goToMap()">マップに戻る</button>
+    </div>
 
-  <script>
-    let playerName = "みらい";
-    let playerGender = "girl";
-    let userPT = 0;
-    let currentStage = 1;
-    const maxStages = 3;
+    <!-- 6. 設定・セーブ消去メニュー -->
+    <div id="menu-screen" class="screen pixel-box">
+        <h3>メニュー / 設定</h3>
+        <label>BGM 音量調整:</label><br>
+        <input type="range" id="bgm-volume" min="0" max="100" value="50" style="width:100%; margin:10px 0;"><br><br>
+        <button class="pixel-btn" style="background:#600;" onclick="resetData()">セーブデータを削除して最初から</button><br><br>
+        <button class="pixel-btn" onclick="closeMenu()">閉じる</button>
+    </div>
+</div>
 
-    // 7つの習慣スコア集計 (1~7)
-    let habitScores = { 1: 20, 2: 20, 3: 20, 4: 20, 5: 20, 6: 20, 7: 20 };
-
-    // 購買部アイテム
-    const shopItems = [
-      { id: 'ribbon_red', name: '赤のりぼん', price: 40, slot: 'accessory', color: '#e74c3c', bought: false },
-      { id: 'glasses_smart', name: 'ガリベン眼鏡', price: 60, slot: 'glasses', color: '#70a1ff', bought: false },
-      { id: 'uniform_gold', name: '黄金の学級委員服', price: 100, slot: 'uniform', color: '#f1c40f', bought: false },
-      { id: 'hat_crown', name: '伝説の王冠', price: 150, slot: 'hat', color: '#eccc68', bought: false },
-      { id: 'aura_god', name: '覇者の光輝オーラ', price: 200, slot: 'aura', color: '#2ecc71', bought: false }
-    ];
-    let equipped = { accessory: null, glasses: null, uniform: null, hat: null, aura: null };
-
-    // Canvas Engine Variables
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-
-    // Canvas Size Setup
-    const TILE_SIZE = 32;
-    const MAP_COLS = 20;
-    const MAP_ROWS = 14;
-
-    // プレイヤーオブジェクト
-    let player = {
-      x: 3 * TILE_SIZE,
-      y: 3 * TILE_SIZE,
-      speed: 3,
-      vx: 0,
-      vy: 0,
-      dir: 'down',
-      animFrame: 0,
-      animTimer: 0
+<script>
+    let gameState = {
+        name: "",
+        skin: "学ラン",
+        points: 0,
+        unlockedStages: 1,
+        currentStage: 1,
+        talkedNpcList: [] // 話しかけ済みのIDを記録
     };
 
-    // マップ上のインタラクティブ・オブジェクト・データ
-    let stageObjects = [];
-    let stageNPCs = [];
-    let stageGoal = { x: 17 * TILE_SIZE, y: 11 * TILE_SIZE };
+    let selectedSkinTemp = "学ラン";
+
+    const stages = [
+        { id: 1, name: "Lv.1 教室 - 散らかった環境", mission: "教室を整頓して集中できる環境を作ろう" },
+        { id: 2, name: "Lv.2 廊下 - 落とし物", mission: "持ち主を探して手伝おう" },
+        { id: 3, name: "Lv.3 体育館 - 用具準備", mission: "みんなと協力して準備を終えよう" },
+        { id: 4, name: "Lv.4 校門 - 朝の挨拶", mission: "気持ちよく挨拶を交わそう" },
+        { id: 5, name: "Lv.5 運動場 - チーム分け", mission: "全員が納得する分け方を決めよう" }
+    ];
+
+    function init() {
+        let saved = localStorage.getItem('7habits_save');
+        if(saved) {
+            gameState = JSON.parse(saved);
+        }
+    }
+
+    function saveGame() {
+        localStorage.setItem('7habits_save', JSON.stringify(gameState));
+    }
+
+    function goToSetup() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('setup-screen').classList.add('active');
+    }
+
+    function selectSkin(skinName, el) {
+        selectedSkinTemp = skinName;
+        document.querySelectorAll('.skin-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+    }
 
     function startGame() {
-      playerName = document.getElementById('player-name').value || "みらい";
-      playerGender = document.querySelector('input[name="gender"]:checked').value;
-
-      document.getElementById('hud-name').innerText = playerName;
-      document.getElementById('setup-screen').classList.remove('active');
-      document.getElementById('game-screen').classList.add('active');
-
-      loadStage(1);
-      requestAnimationFrame(gameLoop);
+        let inputName = document.getElementById('player-name-input').value.trim();
+        gameState.name = inputName; // 空欄の場合はそのまま空欄（または名無し）に
+        gameState.skin = selectedSkinTemp;
+        saveGame();
+        goToMap();
     }
 
-    function loadStage(stageNum) {
-      currentStage = stageNum;
-      document.getElementById('hud-stage').innerText = `${currentStage} / ${maxStages}`;
-      player.x = 2 * TILE_SIZE;
-      player.y = 2 * TILE_SIZE;
+    function goToMap() {
+        saveGame();
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('map-screen').classList.add('active');
+        document.getElementById('user-points').innerText = gameState.points;
 
-      if (stageNum === 1) {
-        // ステージ1: 校門・前庭
-        stageObjects = [
-          { id: 1, type: 'trash', x: 5 * TILE_SIZE, y: 4 * TILE_SIZE, name: '散らかったゴミ', fixed: false, pt: 20, habit: 1, desc: 'ゴミを拾って分別して捨てた！【第1習慣：主体的である】' },
-          { id: 2, type: 'books', x: 12 * TILE_SIZE, y: 3 * TILE_SIZE, name: '倒れた本棚の書類', fixed: false, pt: 20, habit: 3, desc: '整理整頓して元の位置に戻した！【第3習慣：最優先事項】' },
-          { id: 3, type: 'chest', x: 15 * TILE_SIZE, y: 8 * TILE_SIZE, name: '宝箱', fixed: false, pt: 30, habit: 2, desc: '「目標設定ノート」を発見した！【第2習慣：終わりを思い描く】' }
-        ];
-
-        stageNPCs = [
-          {
-            id: 'npc1',
-            name: '困っている後輩',
-            x: 8 * TILE_SIZE,
-            y: 8 * TILE_SIZE,
-            color: '#e67e22',
-            dialogue: {
-              text: '「うう…教科書を忘れてしまって授業についていけそうにありません…」',
-              opts: [
-                { text: 'A: 「半分見せてあげるよ！一緒に考えよう！」', type: 'BEST', habit: 4, pt: 20, exp: '【Win-Win】互いに助け合う素晴らしい姿勢！' },
-                { text: 'B: 「担任の先生に正直に相談しに行こう」', type: 'GOOD', habit: 1, pt: 10, exp: '【普通】適切な助言ができました。' },
-                { text: 'C: 「次からは気をつけなよ〜」と言って立ち去る', type: 'BAD', habit: 0, pt: 0, exp: '【残念】相手の困りごとに寄り添えませんでした。' }
-              ]
+        let container = document.getElementById('stage-buttons');
+        container.innerHTML = "";
+        stages.forEach(st => {
+            let btn = document.createElement('button');
+            btn.className = "pixel-btn";
+            if(st.id <= gameState.unlockedStages) {
+                btn.innerText = st.name;
+                btn.onclick = () => launchStage(st.id);
+            } else {
+                btn.innerText = st.name + " 🔒";
+                btn.disabled = true;
+                btn.style.opacity = "0.4";
             }
-          }
-        ];
-      } else if (stageNum === 2) {
-        // ステージ2: 図書室・廊下
-        stageObjects = [
-          { id: 4, type: 'clock', x: 4 * TILE_SIZE, y: 10 * TILE_SIZE, name: '狂った柱時計', fixed: false, pt: 20, habit: 3, desc: '正確な時間に合わせ直した！【時間管理の意識】' },
-          { id: 5, type: 'trash', x: 10 * TILE_SIZE, y: 5 * TILE_SIZE, name: '置き去りのペットボトル', fixed: false, pt: 20, habit: 1, desc: 'リサイクル箱へキレイに入れた！' },
-          { id: 6, type: 'chest', x: 14 * TILE_SIZE, y: 2 * TILE_SIZE, name: '宝箱', fixed: false, pt: 30, habit: 6, desc: '「シナジーの鍵」を手に入れた！【第6習慣：シナジー】' }
-        ];
-
-        stageNPCs = [
-          {
-            id: 'npc2',
-            name: '悩んでいる図書委員',
-            x: 11 * TILE_SIZE,
-            y: 9 * TILE_SIZE,
-            color: '#9b59b6',
-            dialogue: {
-              text: '「みんなが読みたい本の意見がバラバラでまとまらないんです…」',
-              opts: [
-                { text: 'A: 「まずみんなの理由をじっくり聴いてから決めよう！」', type: 'BEST', habit: 5, pt: 20, exp: '【第5習慣】まず理解に徹し、それから理解される！' },
-                { text: 'B: 「多数決でパッと決めちゃおう！」', type: "GOOD", habit: 4, pt: 10, exp: '【普通】スピーディだけど意見がこぼれるかも。' },
-                { text: 'C: 「委員長が一人で決めればいいんじゃない？」', type: 'BAD', habit: 0, pt: 0, exp: '【残念】協働の機会を逃してしまいました。' }
-              ]
-            }
-          }
-        ];
-      } else {
-        // ステージ3: 地域のオープンキャンパス（総合応用ステージ）
-        stageObjects = [
-          { id: 7, type: 'books', x: 6 * TILE_SIZE, y: 8 * TILE_SIZE, name: '散らばったパンフレット', fixed: false, pt: 20, habit: 6, desc: '綺麗に並べ直してみんなが見やすくした！' },
-          { id: 8, type: 'chest', x: 16 * TILE_SIZE, y: 3 * TILE_SIZE, name: '黄金の宝箱', fixed: false, pt: 50, habit: 7, desc: '「7つの習慣マスターの秘伝書」を獲得！' }
-        ];
-
-        stageNPCs = [
-          {
-            id: 'npc3',
-            name: '道に迷った地域のおじいさん',
-            x: 8 * TILE_SIZE,
-            y: 4 * TILE_SIZE,
-            color: '#1abc9c',
-            dialogue: {
-              text: '「体育館で行われる発表会に行きたいのじゃが、迷ってしまってな…」',
-              opts: [
-                { text: 'A: 「僕も一緒に行きます！案内しますね！」', type: 'BEST', habit: 1, pt: 20, exp: '【主体性＆親切】自ら行動して地域に貢献できた！' },
-                { text: 'B: 「向こうの角を右に曲がると着きますよ」', type: 'GOOD', habit: 5, pt: 10, exp: '【普通】丁寧に教えてあげられました。' },
-                { text: 'C: 「すみません、急いでるので案内板見てください」', type: 'BAD', habit: 0, pt: 0, exp: '【残念】配慮が足りませんでした。' }
-              ]
-            }
-          }
-        ];
-      }
-    }
-
-    const keys = {};
-    window.addEventListener('keydown', e => { keys[e.key] = true; });
-    window.addEventListener('keyup', e => { keys[e.key] = false; });
-
-    let touchMoveDir = null;
-    function setMove(dir) { touchMoveDir = dir; }
-    function stopMove() { touchMoveDir = null; }
-
-    function handleInput() {
-      player.vx = 0;
-      player.vy = 0;
-
-      if (keys['ArrowLeft'] || keys['a'] || touchMoveDir === 'left') { player.vx = -player.speed; player.dir = 'left'; }
-      if (keys['ArrowRight'] || keys['d'] || touchMoveDir === 'right') { player.vx = player.speed; player.dir = 'right'; }
-      if (keys['ArrowUp'] || keys['w'] || touchMoveDir === 'up') { player.vy = -player.speed; player.dir = 'up'; }
-      if (keys['ArrowDown'] || keys['s'] || touchMoveDir === 'down') { player.vy = player.speed; player.dir = 'down'; }
-
-      if (keys[' '] || keys['e']) {
-        triggerAction();
-        keys[' '] = false; keys['e'] = false;
-      }
-
-      // 移動処理＆当たり判定
-      let newX = player.x + player.vx;
-      let newY = player.y + player.vy;
-
-      // 画面端判定
-      if (newX >= TILE_SIZE && newX <= (MAP_COLS - 2) * TILE_SIZE) player.x = newX;
-      if (newY >= TILE_SIZE && newY <= (MAP_ROWS - 2) * TILE_SIZE) player.y = newY;
-
-      // アニメーションタイマー
-      if (player.vx !== 0 || player.vy !== 0) {
-        player.animTimer++;
-        if (player.animTimer % 10 === 0) {
-          player.animFrame = (player.animFrame + 1) % 2;
-        }
-      }
-
-      checkInteractions();
-    }
-
-    let activeInteraction = null;
-
-    function checkInteractions() {
-      const prompt = document.getElementById('interaction-prompt');
-      activeInteraction = null;
-
-      // オブジェクトとの距離チェック
-      for (let obj of stageObjects) {
-        if (!obj.fixed && dist(player, obj) < TILE_SIZE * 1.2) {
-          activeInteraction = { type: 'object', target: obj };
-          prompt.innerText = `${obj.name} を調べる [SPACE]`;
-          prompt.style.display = 'block';
-          return;
-        }
-      }
-
-      // NPCとの距離チェック
-      for (let npc of stageNPCs) {
-        if (dist(player, npc) < TILE_SIZE * 1.3) {
-          activeInteraction = { type: 'npc', target: npc };
-          prompt.innerText = `${npc.name} と話す [SPACE]`;
-          prompt.style.display = 'block';
-          return;
-        }
-      }
-
-      // ゴール判定
-      if (dist(player, stageGoal) < TILE_SIZE * 1.2) {
-        activeInteraction = { type: 'goal' };
-        prompt.innerText = `次のステージへ進む [SPACE]`;
-        prompt.style.display = 'block';
-        return;
-      }
-
-      prompt.style.display = 'none';
-    }
-
-    function triggerAction() {
-      if (!activeInteraction) return;
-
-      if (activeInteraction.type === 'object') {
-        const obj = activeInteraction.target;
-        obj.fixed = true;
-        userPT += obj.pt;
-        if (obj.habit) habitScores[obj.habit] += 15;
-        document.getElementById('hud-pt').innerText = userPT;
-
-        showDialogue("【出来事】", `${obj.desc}\n(+${obj.pt} PT 獲得!)`, []);
-      } else if (activeInteraction.type === 'npc') {
-        const npc = activeInteraction.target;
-        showDialogue(npc.name, npc.dialogue.text, npc.dialogue.opts);
-      } else if (activeInteraction.type === 'goal') {
-        if (currentStage < maxStages) {
-          loadStage(currentStage + 1);
-        } else {
-          showFinalResult();
-        }
-      }
-    }
-
-    function dist(a, b) {
-      return Math.hypot(a.x - b.x, a.y - b.y);
-    }
-
-    function showDialogue(speaker, text, options) {
-      const card = document.getElementById('dialogue-card');
-      document.getElementById('dialogue-speaker').innerText = speaker;
-      document.getElementById('dialogue-text').innerText = text;
-
-      const optsContainer = document.getElementById('dialogue-options');
-      const closeBtn = document.getElementById('dialogue-close-btn');
-      optsContainer.innerHTML = "";
-
-      if (options && options.length > 0) {
-        closeBtn.style.display = 'none';
-        // 選択肢シャッフル
-        let shuffled = [...options].sort(() => Math.random() - 0.5);
-        shuffled.forEach(opt => {
-          const btn = document.createElement('button');
-          btn.className = 'dialogue-opt-btn';
-          btn.innerText = opt.text;
-          btn.onclick = () => selectDialogueOption(opt);
-          optsContainer.appendChild(btn);
+            container.appendChild(btn);
         });
-      } else {
-        closeBtn.style.display = 'block';
-      }
-
-      card.style.display = 'block';
     }
 
-    function selectDialogueOption(opt) {
-      userPT += opt.pt;
-      if (opt.habit) habitScores[opt.habit] += opt.pt;
-      document.getElementById('hud-pt').innerText = userPT;
+    function launchStage(stageId) {
+        gameState.currentStage = stageId;
+        gameState.talkedNpcList = []; // ステージ開始時に会話履歴リセット
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('game-screen').classList.add('active');
+        
+        let st = stages.find(s => s.id === stageId);
+        document.getElementById('mission-tracker').innerText = "Mission: " + st.mission;
 
-      document.getElementById('dialogue-text').innerText = `${opt.exp}\n(+${opt.pt} PT 獲得!)`;
-      document.getElementById('dialogue-options').innerHTML = "";
-      document.getElementById('dialogue-close-btn').style.display = 'block';
+        initCanvasStage(st);
     }
 
-    function closeDialogue() {
-      document.getElementById('dialogue-card').style.display = 'none';
+    function initCanvasStage(st) {
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = "#1e1e24";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#fff";
+        ctx.font = "14px Courier New";
+        ctx.fillText("【" + st.name + "】", 20, 60);
+        ctx.fillText("画面をタップして調べる・話しかける", 20, 90);
+
+        canvas.onclick = () => {
+            triggerInteraction('npc_1');
+        };
     }
 
-    function render() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // 会話・調べ判定（1度話しかけた人は話しかけられない仕組み）
+    function triggerInteraction(targetId) {
+        let dialogue = document.getElementById('dialogue-overlay');
+        let choices = document.getElementById('choices-container');
+        choices.innerHTML = "";
 
-      // 1. レトロドット風 床タイルの描画（添付画像の石畳・カード風）
-      for (let r = 0; r < MAP_ROWS; r++) {
-        for (let c = 0; c < MAP_COLS; c++) {
-          let x = c * TILE_SIZE;
-          let y = r * TILE_SIZE;
+        // すでに話しかけたか判定
+        if(gameState.talkedNpcList.includes(targetId)) {
+            document.getElementById('speaker-name').innerText = "【お知らせ】";
+            document.getElementById('dialogue-text').innerText = "（もうこの人・場所からは新しい話は聞けないようだ。）";
+            dialogue.style.display = "block";
 
-          if (r === 0 || r === MAP_ROWS - 1 || c === 0 || c === MAP_COLS - 1) {
-            // 壁ブロック
-            ctx.fillStyle = '#2d2b38';
-            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = '#4a4458';
-            ctx.strokeRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-          } else {
-            // ドット石畳タイル
-            ctx.fillStyle = (r + c) % 2 === 0 ? '#1b1924' : '#211e2d';
-            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = '#14121b';
-            ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-          }
+            let closeBtn = document.createElement('button');
+            closeBtn.className = "choice-btn";
+            closeBtn.innerText = "閉じる";
+            closeBtn.onclick = () => { dialogue.style.display = "none"; };
+            choices.appendChild(closeBtn);
+            return;
         }
-      }
 
-      // 2. オブジェクト描画（宝箱、ゴミ、散らかった本など）
-      for (let obj of stageObjects) {
-        if (!obj.fixed) {
-          ctx.save();
-          ctx.translate(obj.x, obj.y);
+        // 初回会話
+        dialogue.style.display = "block";
+        document.getElementById('speaker-name').innerText = "クラスメイト";
+        document.getElementById('dialogue-text').innerText = "本棚が倒れそうで散らかってるんだ...どうしたらいいと思う？";
+        
+        let options = [
+            { text: "1. 一緒に一番上の重い本から片付けよう", pts: 20 },
+            { text: "2. 先生を呼びに行って任せよう", pts: 10 },
+            { text: "3. あとでみんなでやることにして放置する", pts: 0 }
+        ];
 
-          if (obj.type === 'chest') {
-            // ドット宝箱描画
-            ctx.fillStyle = '#f1c40f';
-            ctx.fillRect(4, 8, 24, 18);
-            ctx.fillStyle = '#d35400';
-            ctx.fillRect(6, 12, 20, 12);
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(14, 14, 4, 4);
-          } else if (obj.type === 'trash') {
-            // 散らかったゴミ
-            ctx.fillStyle = '#e74c3c';
-            ctx.fillRect(6, 12, 8, 8);
-            ctx.fillStyle = '#7f8c8d';
-            ctx.fillRect(16, 16, 10, 10);
-          } else if (obj.type === 'books') {
-            // 倒れた本棚・書類
-            ctx.fillStyle = '#3498db';
-            ctx.fillRect(6, 10, 12, 14);
-            ctx.fillStyle = '#2ecc71';
-            ctx.fillRect(14, 14, 12, 12);
-          } else {
-            ctx.fillStyle = '#e67e22';
-            ctx.fillRect(6, 6, 20, 20);
-          }
-          ctx.restore();
+        options.forEach(opt => {
+            let btn = document.createElement('button');
+            btn.className = "choice-btn";
+            btn.innerText = opt.text;
+            btn.onclick = () => {
+                gameState.points += opt.pts;
+                gameState.talkedNpcList.push(targetId); // 会話済みIDを記録！
+                dialogue.style.display = "none";
+                finishStage();
+            };
+            choices.appendChild(btn);
+        });
+    }
+
+    function finishStage() {
+        if(gameState.currentStage === gameState.unlockedStages) {
+            gameState.unlockedStages++;
         }
-      }
+        saveGame();
+        
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('eval-screen').classList.add('active');
 
-      // 3. NPC描画
-      for (let npc of stageNPCs) {
-        ctx.save();
-        ctx.translate(npc.x, npc.y);
-
-        // NPCドットキャラ
-        ctx.fillStyle = npc.color;
-        ctx.fillRect(6, 10, 20, 18); // 体
-        ctx.fillStyle = '#ffeaa7';
-        ctx.fillRect(8, 2, 16, 12); // 顔
-        ctx.fillStyle = '#000';
-        ctx.fillRect(11, 6, 3, 3); ctx.fillRect(18, 6, 3, 3); // 目
-
-        ctx.restore();
-      }
-
-      // 4. ゴール地点描画（輝く階段・ポータル）
-      ctx.save();
-      ctx.translate(stageGoal.x, stageGoal.y);
-      ctx.fillStyle = '#2ecc71';
-      ctx.fillRect(4, 4, 24, 24);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 12px Monaco';
-      ctx.fillText('GOAL', 2, 20);
-      ctx.restore();
-
-      // 5. プレイヤー描画（性別・装備・ピョンピョン歩行アニメ）
-      ctx.save();
-      let bounceY = (player.vx !== 0 || player.vy !== 0) ? (player.animFrame * -3) : 0;
-      ctx.translate(player.x, player.y + bounceY);
-
-      // オーラエフェクト装備
-      if (equipped.aura) {
-        ctx.strokeStyle = equipped.aura;
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(16, 16, 20, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-      // 体（制服）
-      ctx.fillStyle = equipped.uniform ? equipped.uniform : (playerGender === 'boy' ? '#2d3436' : '#3867d6');
-      ctx.fillRect(6, 14, 20, 14);
-
-      // 頭
-      ctx.fillStyle = '#ffeaa7';
-      ctx.fillRect(8, 4, 16, 12);
-
-      // 髪型
-      ctx.fillStyle = '#2c3e50';
-      ctx.fillRect(6, 2, 20, 6);
-
-      // 目
-      ctx.fillStyle = '#000';
-      ctx.fillRect(11, 8, 3, 3); ctx.fillRect(18, 8, 3, 3);
-
-      // 帽子装備
-      if (equipped.hat) {
-        ctx.fillStyle = equipped.hat;
-        ctx.fillRect(4, -2, 24, 6);
-      }
-
-      // 眼鏡装備
-      if (equipped.glasses) {
-        ctx.strokeStyle = equipped.glasses;
-        ctx.lineWidth = 2;
-        ctx.strokeRect(9, 7, 6, 5); ctx.strokeRect(17, 7, 6, 5);
-      }
-
-      ctx.restore();
+        renderChart();
     }
 
-    function gameLoop() {
-      handleInput();
-      render();
-      requestAnimationFrame(gameLoop);
+    function renderChart() {
+        let ctx = document.getElementById('radarChart').getContext('2d');
+        if(window.myChart) window.myChart.destroy();
+
+        window.myChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['主体性', '目的設定', '優先順位', 'Win-Win', '理解と尊重', 'シナジー'],
+                datasets: [{
+                    label: '能力値',
+                    data: [85, 70, 75, 90, 65, 80],
+                    backgroundColor: 'rgba(255, 204, 0, 0.2)',
+                    borderColor: '#ffcc00',
+                    pointBackgroundColor: '#fff'
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        angleLines: { color: '#555' },
+                        grid: { color: '#444' },
+                        pointLabels: { color: '#fff', font: { size: 10 } },
+                        ticks: { display: false, backdropColor: 'transparent' }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        document.getElementById('eval-type').innerText = "主体的な解決者タイプ";
+        document.getElementById('eval-advice').innerText = "周りを巻き込みながら素早く行動できました！次は優先順位をさらに意識してみましょう。";
     }
 
-    function openShop() {
-      document.getElementById('shop-pt-val').innerText = userPT;
-      document.getElementById('shop-screen').classList.add('active');
-      renderShop();
+    function openMenu() {
+        document.getElementById('menu-screen').classList.add('active');
     }
 
-    function closeShop() {
-      document.getElementById('shop-screen').classList.remove('active');
+    function closeMenu() {
+        document.getElementById('menu-screen').classList.remove('active');
     }
 
-    function renderShop() {
-      const grid = document.getElementById('shop-items-grid');
-      grid.innerHTML = "";
-
-      shopItems.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'shop-item-card';
-
-        const isEquipped = equipped[item.slot] === item.color;
-        let btnText = !item.bought 
-          ? `<button class="pixel-btn" onclick="buyItem('${item.id}')">${item.price} PT</button>`
-          : (isEquipped ? `<button class="pixel-btn" style="background:#2ecc71;">装備中</button>` : `<button class="pixel-btn" onclick="equipItem('${item.id}')" style="background:#70a1ff;">装備</button>`);
-
-        card.innerHTML = `
-          <div>
-            <strong style="font-size:13px; color:#f1c40f;">${item.name}</strong>
-            <div style="font-size:10px; color:#a4b0be;">分類: ${item.slot}</div>
-          </div>
-          ${btnText}
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function buyItem(id) {
-      const item = shopItems.find(i => i.id === id);
-      if (userPT >= item.price) {
-        userPT -= item.price;
-        item.bought = true;
-        document.getElementById('hud-pt').innerText = userPT;
-        document.getElementById('shop-pt-val').innerText = userPT;
-        equipItem(id);
-      } else {
-        alert("ポイントが足りないよ！マップを探索してためよう。");
-      }
-    }
-
-    function equipItem(id) {
-      const item = shopItems.find(i => i.id === id);
-      equipped[item.slot] = item.color;
-      renderShop();
-    }
-
-    function showFinalResult() {
-      document.getElementById('game-screen').classList.remove('active');
-      document.getElementById('result-screen').classList.add('active');
-
-      const scores = [
-        Math.min(100, habitScores[1]),
-        Math.min(100, habitScores[2]),
-        Math.min(100, habitScores[3]),
-        Math.min(100, habitScores[4]),
-        Math.min(100, habitScores[5]),
-        Math.min(100, habitScores[6]),
-        Math.min(100, habitScores[7])
-      ];
-
-      const ctxChart = document.getElementById('finalRadarChart').getContext('2d');
-      new Chart(ctxChart, {
-        type: 'radar',
-        data: {
-          labels: ['第1:主体性', '第2:目標', '第3:優先順位', '第4:Win-Win', '第5:理解', '第6:シナジー', '第7:刃を研ぐ'],
-          datasets: [{
-            label: `${playerName} さんの探究傾向`,
-            data: scores,
-            backgroundColor: 'rgba(241, 196, 15, 0.3)',
-            borderColor: '#f1c40f',
-            pointBackgroundColor: '#e74c3c'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: { r: { min: 0, max: 100, ticks: { display: false } } },
-          plugins: { legend: { labels: { color: '#fff', font: { size: 10 } } } }
+    function resetData() {
+        if(confirm("本当にセーブデータを全削除して最初からにしますか？")) {
+            localStorage.removeItem('7habits_save');
+            location.reload();
         }
-      });
-
-      let maxVal = Math.max(...scores);
-      let maxIdx = scores.indexOf(maxVal) + 1;
-
-      document.getElementById('result-summary-text').innerHTML = 
-        `お疲れ様でした、<b>${playerName}</b>さん！<br>ステージ探索と対話を通して、あなたの素晴らしい行動力が発揮されました。獲得合計ポイント: <strong style="color:#2ecc71;">${userPT} PT</strong>`;
-
-      document.getElementById('result-detailed-advice').innerHTML = 
-        `あなたの最も高い習慣傾向は<b>「第${maxIdx}の習慣」</b>です！自ら進んで行動する力や周囲への寄り添いが素晴らしい強みになっています。この調子で日常の探究活動にも活かしていきましょう！`;
     }
-  </script>
+
+    init();
+</script>
 </body>
 </html>
