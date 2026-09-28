@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7つの習慣 - レトロドットRPG</title>
+    <title>7つの習慣 - ドットRPG</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -72,7 +72,7 @@
             font-weight: bold;
         }
 
-        /* スキン選択 */
+        /* スキン視覚選択カード */
         .skin-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -81,19 +81,29 @@
         }
         .skin-card {
             border: 2px solid #555;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
             cursor: pointer;
             background: #111;
-            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         .skin-card.selected {
             border-color: #ffcc00;
-            background: #333;
-            color: #ffcc00;
+            background: #222;
+        }
+        .skin-preview {
+            width: 32px;
+            height: 48px;
+            margin-bottom: 6px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
 
-        /* 会話ウィンドウ（黒背景・白太枠） */
+        /* ドット会話ウィンドウ（黒背景・白太枠） */
         #dialogue-overlay {
             position: absolute;
             bottom: 12px;
@@ -141,18 +151,30 @@
         <button class="pixel-btn" onclick="openMenu()">設定・メニュー</button>
     </div>
 
-    <!-- 2. 名前・初期スキン選択画面 -->
+    <!-- 2. 名前・スキン選択画面 -->
     <div id="setup-screen" class="screen pixel-box">
-        <h3 style="color:#ffcc00;">キャラクター作成</h3>
-        <label style="font-size:12px;">名前を入力してください（初期は空欄）:</label>
+        <h3 style="color:#ffcc00; margin-top:0;">キャラクター作成</h3>
+        <label style="font-size:12px;">名前を入力してください:</label>
         <input type="text" id="player-name-input" value="" placeholder="（名前を入力）" style="width:100%; padding:8px; margin:10px 0; background:#111; border:1px solid #fff; color:#fff;">
 
-        <label style="font-size:12px;">初期スキンを選択:</label>
+        <label style="font-size:12px;">スキンを選択:</label>
         <div class="skin-grid">
-            <div class="skin-card selected" onclick="selectSkin('学ラン', this)">🎓 学ラン</div>
-            <div class="skin-card" onclick="selectSkin('ブレザー(パンツ)', this)">👔 ブレザー(ズボン)</div>
-            <div class="skin-card" onclick="selectSkin('ブレザー(スカート)', this)">🧥 ブレザー(スカート)</div>
-            <div class="skin-card" onclick="selectSkin('セーラー', this)">🎀 セーラー</div>
+            <div class="skin-card selected" onclick="selectSkin('学ラン', '#223355', this)">
+                <canvas class="skin-canvas" width="32" height="48" data-color="#223355"></canvas>
+                <span style="font-size:11px; margin-top:4px;">学ラン</span>
+            </div>
+            <div class="skin-card" onclick="selectSkin('ブレザー(パンツ)', '#334433', this)">
+                <canvas class="skin-canvas" width="32" height="48" data-color="#334433"></canvas>
+                <span style="font-size:11px; margin-top:4px;">ブレザー(パンツ)</span>
+            </div>
+            <div class="skin-card" onclick="selectSkin('ブレザー(スカート)', '#552233', this)">
+                <canvas class="skin-canvas" width="32" height="48" data-color="#552233"></canvas>
+                <span style="font-size:11px; margin-top:4px;">ブレザー(スカート)</span>
+            </div>
+            <div class="skin-card" onclick="selectSkin('セーラー', '#112244', this)">
+                <canvas class="skin-canvas" width="32" height="48" data-color="#112244"></canvas>
+                <span style="font-size:11px; margin-top:4px;">セーラー</span>
+            </div>
         </div>
 
         <button class="pixel-btn" onclick="startGame()">決定してマップへ</button>
@@ -160,7 +182,7 @@
 
     <!-- 3. ステージ選択マップ -->
     <div id="map-screen" class="screen pixel-box" style="overflow-y:auto;">
-        <h3 style="color:#ffcc00;">ステージ選択</h3>
+        <h3 style="color:#ffcc00; margin-top:0;">ステージ選択</h3>
         <p style="font-size:13px;">所持ポイント: <span id="user-points" style="color:#ffcc00;">0</span> PT</p>
         <div id="stage-buttons"></div>
     </div>
@@ -168,7 +190,7 @@
     <!-- 4. メインゲーム画面 -->
     <div id="game-screen" class="screen" style="padding:0;">
         <div style="position:absolute; top:8px; left:8px; right:8px; display:flex; justify-content:space-between; z-index:10;">
-            <div class="pixel-box" id="mission-tracker" style="font-size:11px; padding:6px; background:rgba(0,0,0,0.8);">Mission: ---</div>
+            <div class="pixel-box" id="mission-tracker" style="font-size:11px; padding:6px; background:rgba(0,0,0,0.85);">Mission: ---</div>
             <button class="pixel-btn" style="width:auto; padding:4px 8px; font-size:10px; margin:0;" onclick="openMenu()">MENU</button>
         </div>
         
@@ -184,7 +206,7 @@
 
     <!-- 5. ステージ評価画面 -->
     <div id="eval-screen" class="screen pixel-box" style="overflow-y:auto;">
-        <h3 style="color:#ffcc00;">STAGE CLEAR!</h3>
+        <h3 style="color:#ffcc00; margin-top:0;">STAGE CLEAR!</h3>
         <canvas id="radarChart" width="300" height="200"></canvas>
         <p style="margin-top:10px; font-size:13px;"><b>診断タイプ:</b> <span id="eval-type" style="color:#ffcc00;">--</span></p>
         <p style="font-size:13px;"><b>アドバイス:</b></p>
@@ -194,10 +216,10 @@
 
     <!-- 6. 設定・セーブ消去メニュー -->
     <div id="menu-screen" class="screen pixel-box">
-        <h3 style="color:#ffcc00;">メニュー / 設定</h3>
+        <h3 style="color:#ffcc00; margin-top:0;">メニュー / 設定</h3>
         <label style="font-size:12px;">BGM 音量調整:</label><br>
         <input type="range" id="bgm-volume" min="0" max="100" value="50" style="width:100%; margin:10px 0;"><br><br>
-        <button class="pixel-btn" style="background:#500; border-color:#f55;" onclick="resetData()">セーブデータを全削除して最初から</button><br><br>
+        <button class="pixel-btn" style="background:#500; border-color:#f55;" onclick="resetData()">セーブデータを削除して最初から</button><br><br>
         <button class="pixel-btn" onclick="closeMenu()">閉じる</button>
     </div>
 </div>
@@ -206,20 +228,84 @@
     let gameState = {
         name: "",
         skin: "学ラン",
+        skinColor: "#223355",
         points: 0,
         unlockedStages: 1,
         currentStage: 1,
-        talkedNpcList: [] // 話しかけたIDを保持
+        talkedNpcList: []
     };
 
     let selectedSkinTemp = "学ラン";
+    let selectedSkinColorTemp = "#223355";
 
+    // 全7ステージの定義
     const stages = [
-        { id: 1, name: "Lv.1 教室 - 散らかった環境", mission: "教室の物を調べて整頓しよう" },
-        { id: 2, name: "Lv.2 廊下 - 落とし物", mission: "落とし物の持ち主を探しよう" },
-        { id: 3, name: "Lv.3 体育館 - 用具準備", mission: "効率よく用具を準備しよう" },
-        { id: 4, name: "Lv.4 校門 - 朝の挨拶", mission: "気持ちよく挨拶を交わそう" },
-        { id: 5, name: "Lv.5 運動場 - チーム分け", mission: "みんなが納得する分け方を決めよう" }
+        { 
+            id: 1, 
+            name: "STAGE 1: 家 - 朝", 
+            mission: "朝の準備をして出発しよう",
+            bgType: "home",
+            interactions: [
+                { id: "clock", x: 120, y: 320, name: "目覚まし時計", text: "アラームが鳴っている。どうする？", options: [{ text: "すぐに起きて布団をたたむ", pts: 20 }, { text: "あと5分だけ寝る", pts: 0 }] },
+                { id: "desk", x: 320, y: 320, name: "学習デスク", text: "今日持って行く教科書が散らばっている。", options: [{ text: "時間割通りにカバンに入れる", pts: 20 }, { text: "全部まとめて適当に詰め込む", pts: 5 }] }
+            ]
+        },
+        { 
+            id: 2, 
+            name: "STAGE 2: 校門 - 登校", 
+            mission: "挨拶をして校内に入ろう",
+            bgType: "gate",
+            interactions: [
+                { id: "guard", x: 160, y: 400, name: "挨拶運動の生徒", text: "「おはようございます！」と元気に声をかけられた。", options: [{ text: "相手の目を見て元気に挨拶を返す", pts: 20 }, { text: "会釈だけして通り過ぎる", pts: 10 }] },
+                { id: "trash", x: 300, y: 480, name: "校門前のゴミ", text: "足元に空き缶が落ちている。", options: [{ text: "拾ってゴミ箱に捨てる", pts: 20 }, { text: "見なかったことにして進む", pts: 0 }] }
+            ]
+        },
+        { 
+            id: 3, 
+            name: "STAGE 3: 教室 - 第1日目", 
+            mission: "散らかった環境を整頓しよう",
+            bgType: "classroom",
+            interactions: [
+                { id: "desk_messy", x: 140, y: 380, name: "散らかった机", text: "教科書やプリントが山積みになっている。", options: [{ text: "カテゴリごとに整頓する", pts: 20 }, { text: "一旦足元に押し込む", pts: 0 }] },
+                { id: "npc_mirai", x: 260, y: 460, name: "未来（クラスメイト）", text: "「おはよう！今日の準備、手伝ってくれないかな？」", options: [{ text: "喜んで！一緒に片付けよう", pts: 20 }, { text: "自分のことで手一杯だから無理", pts: 0 }] }
+            ]
+        },
+        { 
+            id: 4, 
+            name: "STAGE 4: 廊下 - 昼休み", 
+            mission: "落とし物の持ち主を探そう",
+            bgType: "corridor",
+            interactions: [
+                { id: "item_lost", x: 180, y: 420, name: "落とし物の生徒手帳", text: "廊下に生徒手帳が落ちている。", options: [{ text: "職員室に届ける", pts: 20 }, { text: "そのまま放置する", pts: 0 }] }
+            ]
+        },
+        { 
+            id: 5, 
+            name: "STAGE 5: 体育館 - 練習日", 
+            mission: "みんなと協力して準備を終えよう",
+            bgType: "gym",
+            interactions: [
+                { id: "balls", x: 200, y: 400, name: "用具箱", text: "ボールが散乱している。", options: [{ text: "声を出して全員で一気に片付ける", pts: 20 }, { text: "１人で黙々と片付ける", pts: 10 }] }
+            ]
+        },
+        { 
+            id: 6, 
+            name: "STAGE 6: 運動場 - 昼", 
+            mission: "チームの分け方を話し合おう",
+            bgType: "field",
+            interactions: [
+                { id: "captain", x: 240, y: 450, name: "キャプテン", text: "「チーム分けで意見が割れているんだ…」", options: [{ text: "全員の希望を聞いてWin-Winな提案をする", pts: 20 }, { text: "ジャンケンで強引に決める", pts: 5 }] }
+            ]
+        },
+        { 
+            id: 7, 
+            name: "STAGE 7: お店 - 放課後", 
+            mission: "買い物を済ませて振り返ろう",
+            bgType: "shop",
+            interactions: [
+                { id: "clerk", x: 220, y: 400, name: "店員さん", text: "「今日もお疲れ様！振り返りはできた？」", options: [{ text: "今日の行動をメモして改善点を探す", pts: 20 }, { text: "何も考えずに買い物を終える", pts: 5 }] }
+            ]
+        }
     ];
 
     function init() {
@@ -227,6 +313,16 @@
         if(saved) {
             gameState = JSON.parse(saved);
         }
+        renderSkinPreviews();
+    }
+
+    function renderSkinPreviews() {
+        document.querySelectorAll('.skin-canvas').forEach(canvas => {
+            let ctx = canvas.getContext('2d');
+            let color = canvas.getAttribute('data-color');
+            ctx.clearRect(0, 0, 32, 48);
+            drawPixelSprite(ctx, 6, 4, color);
+        });
     }
 
     function saveGame() {
@@ -236,18 +332,21 @@
     function goToSetup() {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('setup-screen').classList.add('active');
+        renderSkinPreviews();
     }
 
-    function selectSkin(skinName, el) {
+    function selectSkin(skinName, color, el) {
         selectedSkinTemp = skinName;
+        selectedSkinColorTemp = color;
         document.querySelectorAll('.skin-card').forEach(c => c.classList.remove('selected'));
         el.classList.add('selected');
     }
 
     function startGame() {
         let inputName = document.getElementById('player-name-input').value.trim();
-        gameState.name = inputName; // 初期は空欄
+        gameState.name = inputName;
         gameState.skin = selectedSkinTemp;
+        gameState.skinColor = selectedSkinColorTemp;
         saveGame();
         goToMap();
     }
@@ -267,7 +366,7 @@
                 btn.innerText = st.name;
                 btn.onclick = () => launchStage(st.id);
             } else {
-                btn.innerText = st.name + " 🔒 (未解放)";
+                btn.innerText = st.name + " 🔒";
                 btn.disabled = true;
                 btn.style.opacity = "0.4";
             }
@@ -284,29 +383,54 @@
         let st = stages.find(s => s.id === stageId);
         document.getElementById('mission-tracker').innerText = "Mission: " + st.mission;
 
-        drawIsometricStage(st);
+        drawStageCanvas(st);
     }
 
-    // 2.5D クォータービュー風ドットグラフィック描画
-    function drawIsometricStage(st) {
+    function drawStageCanvas(st) {
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
         ctx.imageSmoothingEnabled = false;
 
-        // 背景壁
-        ctx.fillStyle = "#3a3845";
-        ctx.fillRect(0, 0, canvas.width, 240);
-        
-        // 黒板
+        // 背景クォータービュー描画
+        drawIsometricBackground(ctx, st.bgType);
+
+        // インタラクション対象描画
+        st.interactions.forEach(item => {
+            drawObjectOrNpc(ctx, item.x, item.y, item.name);
+        });
+
+        // プレイヤー描画（選択したスキン色適用）
+        drawPixelSprite(ctx, 220, 560, gameState.skinColor);
+
+        // タップ判定
+        canvas.onclick = (e) => {
+            let rect = canvas.getBoundingClientRect();
+            let clickX = e.clientX - rect.left;
+            let clickY = e.clientY - rect.top;
+
+            st.interactions.forEach(item => {
+                if (Math.abs(clickX - item.x) < 40 && Math.abs(clickY - item.y) < 40) {
+                    triggerInteraction(item, st);
+                }
+            });
+        };
+    }
+
+    function drawIsometricBackground(ctx, bgType) {
+        // 壁
+        ctx.fillStyle = bgType === 'home' ? '#4a3b32' : bgType === 'gym' ? '#2b3a4a' : '#3a3845';
+        ctx.fillRect(0, 0, 480, 240);
+
+        // 黒板・窓枠など
         ctx.fillStyle = "#1e4d3b";
         ctx.fillRect(80, 40, 320, 120);
         ctx.strokeStyle = "#8d5b4c";
         ctx.lineWidth = 6;
         ctx.strokeRect(80, 40, 320, 120);
 
-        // 床（クォータービュータイリング）
-        for (let y = 240; y < canvas.height; y += 32) {
-            for (let x = 0; x < canvas.width; x += 32) {
+        // 床
+        for (let y = 240; y < 720; y += 32) {
+            for (let x = 0; x < 480; x += 32) {
                 ctx.fillStyle = ((x / 32 + y / 32) % 2 === 0) ? "#c29b62" : "#b08850";
                 ctx.fillRect(x, y, 32, 32);
                 ctx.strokeStyle = "#96703b";
@@ -314,72 +438,38 @@
                 ctx.strokeRect(x, y, 32, 32);
             }
         }
-
-        // クォータービュー風机と椅子
-        drawDesk(ctx, 100, 350, "本が散らかっている机");
-        drawDesk(ctx, 280, 350, "綺麗に整頓された机");
-        drawDesk(ctx, 190, 480, "NPCのいる机");
-
-        // ドット絵風NPCキャラ
-        drawPixelCharacter(ctx, 210, 450, "#e76f51");
-
-        // プレイヤーキャラ
-        drawPixelCharacter(ctx, 220, 580, "#457b9d");
-
-        // タップ判定
-        canvas.onclick = (e) => {
-            let rect = canvas.getBoundingClientRect();
-            let clickY = e.clientY - rect.top;
-
-            if (clickY < 420) {
-                triggerInteraction('desk_1', '散らかったデスク', '教科書やノートが乱雑に放置されています。どうしますか？');
-            } else {
-                triggerInteraction('npc_1', 'クラスメイト', '「もうすぐ授業が始まるのに、準備が終わらないよ…」');
-            }
-        };
     }
 
-    function drawDesk(ctx, x, y, label) {
-        // 椅子
-        ctx.fillStyle = "#5c3d2e";
-        ctx.fillRect(x + 10, y - 15, 20, 20);
-        // 机上面（斜め下を意識した立体）
-        ctx.fillStyle = "#d4a373";
-        ctx.fillRect(x, y, 40, 26);
-        ctx.fillStyle = "#a97444";
-        ctx.fillRect(x, y + 26, 40, 6);
-        // 脚
-        ctx.fillStyle = "#444";
-        ctx.fillRect(x + 2, y + 32, 4, 16);
-        ctx.fillRect(x + 34, y + 32, 4, 16);
+    function drawObjectOrNpc(ctx, x, y, name) {
+        // オブジェクト/NPCマーカー
+        ctx.fillStyle = "#e76f51";
+        ctx.fillRect(x - 12, y - 20, 24, 24);
+        ctx.fillStyle = "#fff";
+        ctx.font = "10px Courier New";
+        ctx.fillText(name, x - 20, y - 26);
     }
 
-    function drawPixelCharacter(ctx, x, y, color) {
-        // 頭
+    function drawPixelSprite(ctx, x, y, color) {
+        // ドット絵頭・服
         ctx.fillStyle = "#ffdbac";
-        ctx.fillRect(x + 4, y, 16, 14);
-        // 髪
+        ctx.fillRect(x + 4, y, 12, 12);
         ctx.fillStyle = "#4a3728";
-        ctx.fillRect(x + 2, y - 4, 20, 8);
-        // 体（服）
+        ctx.fillRect(x + 2, y - 4, 16, 6);
         ctx.fillStyle = color;
-        ctx.fillRect(x + 2, y + 14, 20, 18);
-        // 足
+        ctx.fillRect(x + 2, y + 12, 16, 16);
         ctx.fillStyle = "#111";
-        ctx.fillRect(x + 4, y + 32, 6, 10);
-        ctx.fillRect(x + 14, y + 32, 6, 10);
+        ctx.fillRect(x + 4, y + 28, 4, 8);
+        ctx.fillRect(x + 12, y + 28, 4, 8);
     }
 
-    // 会話・調べ判定（1度話した人には話せない仕組み）
-    function triggerInteraction(targetId, name, text) {
+    function triggerInteraction(item, st) {
         let dialogue = document.getElementById('dialogue-overlay');
         let choices = document.getElementById('choices-container');
         choices.innerHTML = "";
 
-        // すでに一度調べた/話しかけたか判定
-        if (gameState.talkedNpcList.includes(targetId)) {
+        if (gameState.talkedNpcList.includes(item.id)) {
             document.getElementById('speaker-name').innerText = "【確認】";
-            document.getElementById('dialogue-text').innerText = "（もうここから新しい話を聞く必要はなさそうだ。）";
+            document.getElementById('dialogue-text').innerText = "（もう用はないようだ。）";
             dialogue.style.display = "block";
 
             let closeBtn = document.createElement('button');
@@ -390,26 +480,23 @@
             return;
         }
 
-        // 初回会話・調べ
         dialogue.style.display = "block";
-        document.getElementById('speaker-name').innerText = name;
-        document.getElementById('dialogue-text').innerText = text;
+        document.getElementById('speaker-name').innerText = item.name;
+        document.getElementById('dialogue-text').innerText = item.text;
 
-        let options = [
-            { text: "1. 自分の教科書を貸して一緒に見る", pts: 20 },
-            { text: "2. 先生に相談するようにアドバイスする", pts: 10 },
-            { text: "3. 自分には関係ないのでそのままにする", pts: 0 }
-        ];
-
-        options.forEach(opt => {
+        item.options.forEach(opt => {
             let btn = document.createElement('button');
             btn.className = "choice-btn";
             btn.innerText = opt.text;
             btn.onclick = () => {
                 gameState.points += opt.pts;
-                gameState.talkedNpcList.push(targetId); // 会話済みID追加
+                gameState.talkedNpcList.push(item.id);
                 dialogue.style.display = "none";
-                finishStage();
+
+                // 全タスク完了判定
+                if (gameState.talkedNpcList.length >= st.interactions.length) {
+                    finishStage();
+                }
             };
             choices.appendChild(btn);
         });
