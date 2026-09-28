@@ -3,15 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7つの習慣 - レトロRPG</title>
+    <title>7つの習慣 - レトロドットRPG</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --pixel-bg: #000000;
-            --pixel-border: #ffffff;
-            --pixel-accent: #ffcc00;
-        }
-
         * {
             box-sizing: border-box;
             user-select: none;
@@ -21,7 +15,7 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #111;
+            background-color: #050508;
             color: #fff;
             display: flex;
             justify-content: center;
@@ -32,8 +26,8 @@
         #game-container {
             width: 480px;
             height: 720px;
-            background-color: var(--pixel-bg);
-            border: 4px solid var(--pixel-border);
+            background-color: #000;
+            border: 4px solid #fff;
             position: relative;
             overflow: hidden;
         }
@@ -47,13 +41,13 @@
             display: none;
             flex-direction: column;
             padding: 16px;
+            background-color: #000;
         }
 
         .active {
             display: flex;
         }
 
-        /* レトロドットUI */
         .pixel-box {
             background-color: #000;
             border: 4px solid #fff;
@@ -62,19 +56,20 @@
         }
 
         .pixel-btn {
-            background: #222;
+            background: #111;
             border: 2px solid #fff;
             color: #fff;
             padding: 10px;
             cursor: pointer;
             font-size: 14px;
-            margin: 4px 0;
+            margin: 6px 0;
             text-align: center;
             width: 100%;
         }
         .pixel-btn:hover {
             background: #ffcc00;
             color: #000;
+            font-weight: bold;
         }
 
         /* スキン選択 */
@@ -85,28 +80,31 @@
             margin: 15px 0;
         }
         .skin-card {
-            border: 2px solid #777;
-            padding: 10px;
+            border: 2px solid #555;
+            padding: 12px;
             text-align: center;
             cursor: pointer;
             background: #111;
+            font-size: 13px;
         }
         .skin-card.selected {
             border-color: #ffcc00;
             background: #333;
+            color: #ffcc00;
         }
 
-        /* 下部ドットテキストメッセージ（黒背景・白太枠） */
+        /* 会話ウィンドウ（黒背景・白太枠） */
         #dialogue-overlay {
             position: absolute;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
             background-color: #000000;
             border: 4px solid #ffffff;
             padding: 12px;
             display: none;
             z-index: 100;
+            box-shadow: 0 0 10px #000;
         }
 
         .choice-btn {
@@ -114,7 +112,7 @@
             width: 100%;
             text-align: left;
             margin-top: 6px;
-            background: #111;
+            background: #000;
             border: 1px solid #fff;
             color: #fff;
             padding: 8px;
@@ -138,68 +136,68 @@
 <div id="game-container">
     <!-- 1. タイトル画面 -->
     <div id="title-screen" class="screen active" style="justify-content:center; align-items:center; text-align:center;">
-        <h1 style="color:#ffcc00; font-size:24px; margin-bottom:30px;">7つの習慣<br>ドットRPG</h1>
-        <button class="pixel-btn" onclick="goToSetup()">はじめから（スタート）</button>
+        <h1 style="color:#ffcc00; font-size:24px; margin-bottom:30px; line-height:1.4;">7つの習慣<br>ドットRPG</h1>
+        <button class="pixel-btn" onclick="goToSetup()">はじめから</button>
         <button class="pixel-btn" onclick="openMenu()">設定・メニュー</button>
     </div>
 
-    <!-- 2. 名前・初期スキン選択画面（初期状態は空欄） -->
+    <!-- 2. 名前・初期スキン選択画面 -->
     <div id="setup-screen" class="screen pixel-box">
-        <h3>キャラクター作成</h3>
-        <label>名前を入力してください（空欄可）:</label>
+        <h3 style="color:#ffcc00;">キャラクター作成</h3>
+        <label style="font-size:12px;">名前を入力してください（初期は空欄）:</label>
         <input type="text" id="player-name-input" value="" placeholder="（名前を入力）" style="width:100%; padding:8px; margin:10px 0; background:#111; border:1px solid #fff; color:#fff;">
 
-        <label>初期スキンを選択:</label>
+        <label style="font-size:12px;">初期スキンを選択:</label>
         <div class="skin-grid">
-            <div class="skin-card selected" onclick="selectSkin('学ラン', this)">学ラン</div>
-            <div class="skin-card" onclick="selectSkin('ブレザー(パンツ)', this)">ブレザー(パンツ)</div>
-            <div class="skin-card" onclick="selectSkin('ブレザー(スカート)', this)">ブレザー(スカート)</div>
-            <div class="skin-card" onclick="selectSkin('セーラー', this)">セーラー</div>
+            <div class="skin-card selected" onclick="selectSkin('学ラン', this)">🎓 学ラン</div>
+            <div class="skin-card" onclick="selectSkin('ブレザー(パンツ)', this)">👔 ブレザー(ズボン)</div>
+            <div class="skin-card" onclick="selectSkin('ブレザー(スカート)', this)">🧥 ブレザー(スカート)</div>
+            <div class="skin-card" onclick="selectSkin('セーラー', this)">🎀 セーラー</div>
         </div>
 
-        <button class="pixel-btn" onclick="startGame()">決定してステージマップへ</button>
+        <button class="pixel-btn" onclick="startGame()">決定してマップへ</button>
     </div>
 
     <!-- 3. ステージ選択マップ -->
     <div id="map-screen" class="screen pixel-box" style="overflow-y:auto;">
-        <h3>ステージ選択</h3>
-        <p>所持ポイント: <span id="user-points" style="color:#ffcc00;">0</span> PT</p>
+        <h3 style="color:#ffcc00;">ステージ選択</h3>
+        <p style="font-size:13px;">所持ポイント: <span id="user-points" style="color:#ffcc00;">0</span> PT</p>
         <div id="stage-buttons"></div>
     </div>
 
     <!-- 4. メインゲーム画面 -->
     <div id="game-screen" class="screen" style="padding:0;">
         <div style="position:absolute; top:8px; left:8px; right:8px; display:flex; justify-content:space-between; z-index:10;">
-            <div class="pixel-box" id="mission-tracker" style="font-size:11px; padding:6px;">Mission: ---</div>
-            <button class="pixel-btn" style="width:auto; padding:4px 8px; font-size:10px;" onclick="openMenu()">MENU</button>
+            <div class="pixel-box" id="mission-tracker" style="font-size:11px; padding:6px; background:rgba(0,0,0,0.8);">Mission: ---</div>
+            <button class="pixel-btn" style="width:auto; padding:4px 8px; font-size:10px; margin:0;" onclick="openMenu()">MENU</button>
         </div>
         
         <canvas id="game-canvas" width="480" height="720"></canvas>
 
-        <!-- ドット風下部メッセージ枠 -->
+        <!-- 会話ウィンドウ（黒背景・白太枠） -->
         <div id="dialogue-overlay">
             <div id="speaker-name" style="color:#ffcc00; font-weight:bold; font-size:13px; margin-bottom:4px;"></div>
-            <div id="dialogue-text" style="font-size:12px; line-height:1.4;"></div>
+            <div id="dialogue-text" style="font-size:12px; line-height:1.5;"></div>
             <div id="choices-container" style="margin-top:8px;"></div>
         </div>
     </div>
 
     <!-- 5. ステージ評価画面 -->
     <div id="eval-screen" class="screen pixel-box" style="overflow-y:auto;">
-        <h3>STAGE CLEAR!</h3>
+        <h3 style="color:#ffcc00;">STAGE CLEAR!</h3>
         <canvas id="radarChart" width="300" height="200"></canvas>
-        <p style="margin-top:10px;"><b>診断タイプ:</b> <span id="eval-type" style="color:#ffcc00;">--</span></p>
-        <p><b>アドバイス:</b></p>
-        <p id="eval-advice" style="font-size:12px; color:#ccc; line-height:1.4;"></p>
+        <p style="margin-top:10px; font-size:13px;"><b>診断タイプ:</b> <span id="eval-type" style="color:#ffcc00;">--</span></p>
+        <p style="font-size:13px;"><b>アドバイス:</b></p>
+        <p id="eval-advice" style="font-size:12px; color:#ccc; line-height:1.5;"></p>
         <button class="pixel-btn" onclick="goToMap()">マップに戻る</button>
     </div>
 
     <!-- 6. 設定・セーブ消去メニュー -->
     <div id="menu-screen" class="screen pixel-box">
-        <h3>メニュー / 設定</h3>
-        <label>BGM 音量調整:</label><br>
+        <h3 style="color:#ffcc00;">メニュー / 設定</h3>
+        <label style="font-size:12px;">BGM 音量調整:</label><br>
         <input type="range" id="bgm-volume" min="0" max="100" value="50" style="width:100%; margin:10px 0;"><br><br>
-        <button class="pixel-btn" style="background:#600;" onclick="resetData()">セーブデータを削除して最初から</button><br><br>
+        <button class="pixel-btn" style="background:#500; border-color:#f55;" onclick="resetData()">セーブデータを全削除して最初から</button><br><br>
         <button class="pixel-btn" onclick="closeMenu()">閉じる</button>
     </div>
 </div>
@@ -211,17 +209,17 @@
         points: 0,
         unlockedStages: 1,
         currentStage: 1,
-        talkedNpcList: [] // 話しかけ済みのIDを記録
+        talkedNpcList: [] // 話しかけたIDを保持
     };
 
     let selectedSkinTemp = "学ラン";
 
     const stages = [
-        { id: 1, name: "Lv.1 教室 - 散らかった環境", mission: "教室を整頓して集中できる環境を作ろう" },
-        { id: 2, name: "Lv.2 廊下 - 落とし物", mission: "持ち主を探して手伝おう" },
-        { id: 3, name: "Lv.3 体育館 - 用具準備", mission: "みんなと協力して準備を終えよう" },
+        { id: 1, name: "Lv.1 教室 - 散らかった環境", mission: "教室の物を調べて整頓しよう" },
+        { id: 2, name: "Lv.2 廊下 - 落とし物", mission: "落とし物の持ち主を探そう" },
+        { id: 3, name: "Lv.3 体育館 - 用具準備", mission: "効率よく用具を準備しよう" },
         { id: 4, name: "Lv.4 校門 - 朝の挨拶", mission: "気持ちよく挨拶を交わそう" },
-        { id: 5, name: "Lv.5 運動場 - チーム分け", mission: "全員が納得する分け方を決めよう" }
+        { id: 5, name: "Lv.5 運動場 - チーム分け", mission: "みんなが納得する分け方を決めよう" }
     ];
 
     function init() {
@@ -248,7 +246,7 @@
 
     function startGame() {
         let inputName = document.getElementById('player-name-input').value.trim();
-        gameState.name = inputName; // 空欄の場合はそのまま空欄（または名無し）に
+        gameState.name = inputName; // 初期は空欄
         gameState.skin = selectedSkinTemp;
         saveGame();
         goToMap();
@@ -269,7 +267,7 @@
                 btn.innerText = st.name;
                 btn.onclick = () => launchStage(st.id);
             } else {
-                btn.innerText = st.name + " 🔒";
+                btn.innerText = st.name + " 🔒 (未解放)";
                 btn.disabled = true;
                 btn.style.opacity = "0.4";
             }
@@ -279,43 +277,109 @@
 
     function launchStage(stageId) {
         gameState.currentStage = stageId;
-        gameState.talkedNpcList = []; // ステージ開始時に会話履歴リセット
+        gameState.talkedNpcList = [];
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('game-screen').classList.add('active');
         
         let st = stages.find(s => s.id === stageId);
         document.getElementById('mission-tracker').innerText = "Mission: " + st.mission;
 
-        initCanvasStage(st);
+        drawIsometricStage(st);
     }
 
-    function initCanvasStage(st) {
+    // 2.5D クォータービュー風ドットグラフィック描画
+    function drawIsometricStage(st) {
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+
+        // 背景壁
+        ctx.fillStyle = "#3a3845";
+        ctx.fillRect(0, 0, canvas.width, 240);
         
-        ctx.fillStyle = "#1e1e24";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // 黒板
+        ctx.fillStyle = "#1e4d3b";
+        ctx.fillRect(80, 40, 320, 120);
+        ctx.strokeStyle = "#8d5b4c";
+        ctx.lineWidth = 6;
+        ctx.strokeRect(80, 40, 320, 120);
 
-        ctx.fillStyle = "#fff";
-        ctx.font = "14px Courier New";
-        ctx.fillText("【" + st.name + "】", 20, 60);
-        ctx.fillText("画面をタップして調べる・話しかける", 20, 90);
+        // 床（クォータービュータイリング）
+        for (let y = 240; y < canvas.height; y += 32) {
+            for (let x = 0; x < canvas.width; x += 32) {
+                ctx.fillStyle = ((x / 32 + y / 32) % 2 === 0) ? "#c29b62" : "#b08850";
+                ctx.fillRect(x, y, 32, 32);
+                ctx.strokeStyle = "#96703b";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(x, y, 32, 32);
+            }
+        }
 
-        canvas.onclick = () => {
-            triggerInteraction('npc_1');
+        // クォータービュー風机と椅子
+        drawDesk(ctx, 100, 350, "本が散らかっている机");
+        drawDesk(ctx, 280, 350, "綺麗に整頓された机");
+        drawDesk(ctx, 190, 480, "NPCのいる机");
+
+        // ドット絵風NPCキャラ
+        drawPixelCharacter(ctx, 210, 450, "#e76f51");
+
+        // プレイヤーキャラ
+        drawPixelCharacter(ctx, 220, 580, "#457b9d");
+
+        // タップ判定
+        canvas.onclick = (e) => {
+            let rect = canvas.getBoundingClientRect();
+            let clickY = e.clientY - rect.top;
+
+            if (clickY < 420) {
+                triggerInteraction('desk_1', '散らかったデスク', '教科書やノートが乱雑に放置されています。どうしますか？');
+            } else {
+                triggerInteraction('npc_1', 'クラスメイト', '「もうすぐ授業が始まるのに、準備が終わらないよ…」');
+            }
         };
     }
 
-    // 会話・調べ判定（1度話しかけた人は話しかけられない仕組み）
-    function triggerInteraction(targetId) {
+    function drawDesk(ctx, x, y, label) {
+        // 椅子
+        ctx.fillStyle = "#5c3d2e";
+        ctx.fillRect(x + 10, y - 15, 20, 20);
+        // 机上面（斜め下を意識した立体）
+        ctx.fillStyle = "#d4a373";
+        ctx.fillRect(x, y, 40, 26);
+        ctx.fillStyle = "#a97444";
+        ctx.fillRect(x, y + 26, 40, 6);
+        // 脚
+        ctx.fillStyle = "#444";
+        ctx.fillRect(x + 2, y + 32, 4, 16);
+        ctx.fillRect(x + 34, y + 32, 4, 16);
+    }
+
+    function drawPixelCharacter(ctx, x, y, color) {
+        // 頭
+        ctx.fillStyle = "#ffdbac";
+        ctx.fillRect(x + 4, y, 16, 14);
+        // 髪
+        ctx.fillStyle = "#4a3728";
+        ctx.fillRect(x + 2, y - 4, 20, 8);
+        // 体（服）
+        ctx.fillStyle = color;
+        ctx.fillRect(x + 2, y + 14, 20, 18);
+        // 足
+        ctx.fillStyle = "#111";
+        ctx.fillRect(x + 4, y + 32, 6, 10);
+        ctx.fillRect(x + 14, y + 32, 6, 10);
+    }
+
+    // 会話・調べ判定（1度話した人には話せない仕組み）
+    function triggerInteraction(targetId, name, text) {
         let dialogue = document.getElementById('dialogue-overlay');
         let choices = document.getElementById('choices-container');
         choices.innerHTML = "";
 
-        // すでに話しかけたか判定
-        if(gameState.talkedNpcList.includes(targetId)) {
-            document.getElementById('speaker-name').innerText = "【お知らせ】";
-            document.getElementById('dialogue-text').innerText = "（もうこの人・場所からは新しい話は聞けないようだ。）";
+        // すでに一度調べた/話しかけたか判定
+        if (gameState.talkedNpcList.includes(targetId)) {
+            document.getElementById('speaker-name').innerText = "【確認】";
+            document.getElementById('dialogue-text').innerText = "（もうここから新しい話を聞く必要はなさそうだ。）";
             dialogue.style.display = "block";
 
             let closeBtn = document.createElement('button');
@@ -326,15 +390,15 @@
             return;
         }
 
-        // 初回会話
+        // 初回会話・調べ
         dialogue.style.display = "block";
-        document.getElementById('speaker-name').innerText = "クラスメイト";
-        document.getElementById('dialogue-text').innerText = "本棚が倒れそうで散らかってるんだ...どうしたらいいと思う？";
-        
+        document.getElementById('speaker-name').innerText = name;
+        document.getElementById('dialogue-text').innerText = text;
+
         let options = [
-            { text: "1. 一緒に一番上の重い本から片付けよう", pts: 20 },
-            { text: "2. 先生を呼びに行って任せよう", pts: 10 },
-            { text: "3. あとでみんなでやることにして放置する", pts: 0 }
+            { text: "1. 自分の教科書を貸して一緒に見る", pts: 20 },
+            { text: "2. 先生に相談するようにアドバイスする", pts: 10 },
+            { text: "3. 自分には関係ないのでそのままにする", pts: 0 }
         ];
 
         options.forEach(opt => {
@@ -343,7 +407,7 @@
             btn.innerText = opt.text;
             btn.onclick = () => {
                 gameState.points += opt.pts;
-                gameState.talkedNpcList.push(targetId); // 会話済みIDを記録！
+                gameState.talkedNpcList.push(targetId); // 会話済みID追加
                 dialogue.style.display = "none";
                 finishStage();
             };
